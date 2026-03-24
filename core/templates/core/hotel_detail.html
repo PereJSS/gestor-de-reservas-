@@ -1,0 +1,98 @@
+{% extends "_includes/_layout.html" %}
+{% block content %}
+
+{% if hotel.cover_image %}
+<div class="row mb-4">
+  <div class="col-12 px-0">
+    <img
+      src="{{ hotel.cover_image.url }}"
+      alt="{{ hotel.name }}"
+      class="w-100 rounded-3"
+      style="max-height: 340px; object-fit: cover"
+    />
+  </div>
+</div>
+{% endif %}
+
+<div class="row mb-4">
+  <div class="col-12">
+    <a href="{% url 'core:home' %}" class="btn btn-outline-secondary btn-sm mb-3">← Volver a hoteles</a>
+    <h1 class="h2 mb-1">{{ hotel.name }}</h1>
+    <p class="text-muted mb-2">
+      <i class="bi bi-geo-alt-fill"></i>
+      {{ hotel.address }}, {{ hotel.city }}{% if hotel.country %}, {{ hotel.country }}{% endif %}
+    </p>
+    {% if hotel.description %}
+    <p class="mb-0">{{ hotel.description }}</p>
+    {% endif %}
+  </div>
+</div>
+
+<div class="row mb-4">
+  <div class="col-12">
+    <div class="card border-0 shadow-sm">
+      <div class="card-body">
+        <h6 class="mb-3">Buscar habitaciones disponibles</h6>
+        <form method="get" class="row g-3 align-items-end">
+          <div class="col-md-4">
+            <label class="form-label">Fecha de entrada</label>
+            <input type="date" name="start_date" class="form-control" value="{{ start_date }}" required />
+          </div>
+          <div class="col-md-4">
+            <label class="form-label">Fecha de salida</label>
+            <input type="date" name="end_date" class="form-control" value="{{ end_date }}" required />
+          </div>
+          <div class="col-md-4 d-grid">
+            <button type="submit" class="btn btn-primary">Ver disponibilidad</button>
+          </div>
+        </form>
+        {% if filtered %}
+        <p class="text-muted small mt-2 mb-0">
+          Mostrando habitaciones disponibles del <strong>{{ start_date }}</strong> al <strong>{{ end_date }}</strong>.
+          <a href="{% url 'core:hotel-detail' hotel.id %}">Ver todas</a>
+        </p>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="row">
+  {% for room in rooms %}
+  <div class="col-lg-4 col-md-6 mb-4">
+    <div class="card h-100 shadow-sm border-0">
+      {% if room.cover_image %}
+      <img
+        src="{{ room.cover_image.url }}"
+        class="card-img-top"
+        alt="Habitacion {{ room.room_number }}"
+        style="height: 220px; object-fit: cover"
+      />
+      {% else %}
+      <div class="bg-light d-flex align-items-center justify-content-center" style="height: 220px">
+        <span class="text-muted">Sin imagen disponible</span>
+      </div>
+      {% endif %}
+
+      <div class="card-body">
+        <h5 class="card-title mb-2">Habitacion {{ room.room_number }}</h5>
+        <p class="mb-1"><strong>Tipo:</strong> {{ room.room_type }}</p>
+        <p class="mb-1"><strong>Capacidad:</strong> {{ room.capacity }} persona{{ room.capacity|pluralize }}</p>
+        <p class="mb-0"><strong>Precio:</strong> ${{ room.price_per_night }} / noche</p>
+      </div>
+
+      <div class="card-footer bg-transparent border-top-0 pb-3">
+        <a href="{% url 'bookings:booking-create' %}?room={{ room.id }}{% if start_date %}&start_date={{ start_date }}&end_date={{ end_date }}{% endif %}" class="btn btn-primary w-100">Reservar esta habitacion</a>
+      </div>
+    </div>
+  </div>
+  {% empty %}
+  <div class="col-12">
+    <div class="alert alert-info">
+      Este hotel no tiene habitaciones disponibles por ahora.
+    </div>
+  </div>
+  {% endfor %}
+</div>
+
+{% endblock %}

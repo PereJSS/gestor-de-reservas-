@@ -1,0 +1,62 @@
+{% extends "_includes/_layout.html" %} {% block content %}
+<div class="row justify-content-center">
+  <div class="col-12 col-md-9 col-lg-6">
+    <div class="card shadow-sm border-0">
+      <div class="card-body p-4 p-md-5">
+        <h1 class="h3 mb-3">Crear cuenta</h1>
+        <p class="text-muted mb-4">
+          Regístrate para reservar habitaciones y gestionar tus estancias.
+        </p>
+
+        <form method="post" novalidate>
+          {% csrf_token %} {% if form.non_field_errors %}
+          <div class="alert alert-danger" role="alert">
+            {{ form.non_field_errors }}
+          </div>
+          {% endif %}
+
+          <div class="mb-3">
+            <label for="id_username" class="form-label">Usuario</label>
+            {{ form.username }} {% for error in form.username.errors %}
+            <div class="text-danger small">{{ error }}</div>
+            {% endfor %}
+          </div>
+
+          <div class="mb-3">
+            <label for="id_email" class="form-label">Correo electrónico</label>
+            {{ form.email }} {% for error in form.email.errors %}
+            <div class="text-danger small">{{ error }}</div>
+            {% endfor %}
+          </div>
+
+          <div class="mb-3">
+            <label for="id_password1" class="form-label">Contraseña</label>
+            {{ form.password1 }} {% for error in form.password1.errors %}
+            <div class="text-danger small">{{ error }}</div>
+            {% endfor %}
+          </div>
+
+          <div class="mb-3">
+            <label for="id_password2" class="form-label"
+              >Confirmar contraseña</label
+            >
+            {{ form.password2 }} {% for error in form.password2.errors %}
+            <div class="text-danger small">{{ error }}</div>
+            {% endfor %}
+          </div>
+
+          <button type="submit" class="btn btn-primary w-100">
+            Registrarme
+          </button>
+        </form>
+
+        <hr class="my-4" />
+        <p class="mb-0 text-center">
+          ¿Ya tienes cuenta?
+          <a href="{% url 'core:user_login' %}">Iniciar sesión</a>
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

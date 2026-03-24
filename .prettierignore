@@ -1,0 +1,6 @@
+# Archivos excluidos del formateo automatico de Prettier
+core/templates/home.html
+core/templates/core/*.html
+core/templates/auth/*.html
+core/templates/_includes/*.html
+bookings/templates/bookings/*.html

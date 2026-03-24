@@ -1,0 +1,62 @@
+{% extends "_includes/_layout.html" %} {% block content %}
+<div class="row justify-content-center">
+  <div class="col-12 col-md-8 col-lg-6">
+    <div class="card shadow-sm border-0">
+      <div class="card-body p-4 p-md-5">
+        <h1 class="h3 mb-3">Crear reserva</h1>
+        <p class="text-muted mb-4">
+          Completa los datos para confirmar tu reserva.
+        </p>
+
+        <form method="post" novalidate>
+          {% csrf_token %} {% if form.non_field_errors %}
+          <div class="alert alert-danger" role="alert">
+            {{ form.non_field_errors }}
+          </div>
+          {% endif %}
+
+          <div class="mb-3">
+            <label for="id_room" class="form-label">Habitacion</label>
+            {{ form.room }} {% for error in form.room.errors %}
+            <div class="text-danger small">{{ error }}</div>
+            {% endfor %}
+          </div>
+
+          <div class="mb-3">
+            <label for="id_start_date" class="form-label"
+              >Fecha de entrada</label
+            >
+            {{ form.start_date }} {% for error in form.start_date.errors %}
+            <div class="text-danger small">{{ error }}</div>
+            {% endfor %}
+          </div>
+
+          <div class="mb-3">
+            <label for="id_end_date" class="form-label">Fecha de salida</label>
+            {{ form.end_date }} {% for error in form.end_date.errors %}
+            <div class="text-danger small">{{ error }}</div>
+            {% endfor %}
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label">Repetir reserva (opcional)</label>
+            {{ form.recurrence }}
+            <div class="form-text">
+              Usa este campo para crear una reserva recurrente (semanal,
+              mensual, etc.).
+            </div>
+            {% for error in form.recurrence.errors %}
+            <div class="text-danger small">{{ error }}</div>
+            {% endfor %}
+          </div>
+
+          <button type="submit" class="btn btn-primary w-100">
+            Confirmar reserva
+          </button>
+        </form>
+        {{ form.media }}
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

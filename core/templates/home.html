@@ -1,0 +1,81 @@
+{% extends "_includes/_layout.html" %} {% block content %}
+<div class="container mt-5">
+
+  <div class="row mb-4">
+    <div class="col-12">
+      <div class="alert alert-warning border-0 shadow-sm d-flex flex-column flex-md-row align-items-md-center justify-content-between gap-3" role="alert">
+        <div>
+          <h5 class="mb-1"><i class="bi bi-shield-lock-fill me-2"></i>Panel de administración</h5>
+          <p class="mb-1 small">Accede para gestionar hoteles, habitaciones y reservas.</p>
+          <span class="badge bg-dark me-1">Usuario: admin</span>
+          <span class="badge bg-dark">Contraseña: Admin1234!</span>
+        </div>
+        <a href="/admin/" class="btn btn-dark text-nowrap" target="_blank">
+          <i class="bi bi-gear-fill me-1"></i> Ir al admin
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <div class="row mb-4">
+    <div class="col text-center">
+      <h1 class="display-4 fw-bold">Explora nuestros Hoteles</h1>
+      <p class="lead text-muted">Reserva tu habitación ideal en pocos clics.</p>
+    </div>
+  </div>
+
+  <div class="row">
+    {% for hotel in hotels %}
+    <div class="col-lg-4 col-md-6 mb-4">
+      <div class="card h-100 shadow-sm border-0">
+        {% if hotel.cover_image %}
+        <img
+          src="{{ hotel.cover_image.url }}"
+          class="card-img-top"
+          alt="{{ hotel.name }}"
+          style="height: 220px; object-fit: cover"
+        />
+        {% else %}
+        <div
+          class="bg-secondary text-white d-flex align-items-center justify-content-center"
+          style="height: 220px"
+        >
+          <span>Sin imagen disponible</span>
+        </div>
+        {% endif %}
+
+        <div class="card-body">
+          <div class="d-flex justify-content-between align-items-start mb-2">
+            <h5 class="card-title mb-0">{{ hotel.name }}</h5>
+            <span class="badge bg-primary">{{ hotel.city }}</span>
+          </div>
+          <p class="text-muted small">
+            <i class="bi bi-geo-alt-fill"></i>
+
+            {{ hotel.address }} {% if hotel.country %}, {{ hotel.country }}{% endif %}                                                                             
+          </p>
+          <p class="card-text">{{ hotel.description|truncatechars:120 }}</p>
+        </div>
+
+        <div class="card-footer bg-transparent border-top-0 pb-3">
+          <div class="d-grid">
+            <a
+              href="{% url 'core:hotel-detail' hotel.id %}"
+              class="btn btn-primary"
+            >
+              Ver habitaciones
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+    {% empty %}
+    <div class="col-12 text-center py-5">
+      <div class="alert alert-info">
+        Actualmente no hay hoteles disponibles. ¡Vuelve pronto!
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+</div>
+{% endblock %}

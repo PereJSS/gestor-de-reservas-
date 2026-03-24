@@ -1,0 +1,15 @@
+. Gestor de Reservas 
+Objetivo 
+Sistema para reservar recursos como pistas deportivas o salas. 
+Modelos sugeridos 
+● Resource 
+● Booking 
+● Availability 
+● User 
+Funcionalidades clave 
+● Calendario de disponibilidad 
+● Evitar solapamiento de reservas 
+● Reservas recurrentes 
+Extras o retos opcionales 
+● Notificaciones de reserva/cancelación 
+● Panel de gestión para admins 
