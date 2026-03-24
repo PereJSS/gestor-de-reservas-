@@ -60,35 +60,7 @@ El comando `cargar_demo` crea automáticamente:
 | **Usuario** | `admin` |
 | **Contraseña** | `Admin1234!` |
 
-## Despliegue en PythonAnywhere
 
-1. Clona el repo en la consola Bash de PythonAnywhere
-2. Crea un virtualenv e instala `requirements.txt`
-3. Configura las variables de entorno en la pestaña **Web**:
-
-   | Variable | Valor |
-   |---|---|
-   | `SECRET_KEY` | clave secreta larga |
-   | `DEBUG` | `False` |
-   | `ALLOWED_HOSTS` | `tuusuario.pythonanywhere.com` |
-
-4. Apunta el fichero WSGI a `gestor.settings`
-5. Añade las rutas de estáticos y media en la pestaña **Web**
-6. Ejecuta las migraciones y carga los datos de demo:
-
-   ```bash
-   python manage.py migrate
-   python manage.py collectstatic --no-input
-   python manage.py cargar_demo
-   ```
-
-## Tests
-
-```bash
-DEBUG=True python manage.py test core bookings
-```
-
-Resultado esperado: **32 tests OK**
 
 ## Estructura del proyecto
 
