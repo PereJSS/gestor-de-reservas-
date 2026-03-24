@@ -10,8 +10,11 @@ django-model-utils==5.0.0
 django-notifications-hq==1.8.3
 django-recurrence==1.11.1
 django-scheduler==0.10.1
+gunicorn==23.0.0
 icalendar==6.3.2
 jsonfield==3.1.0
+packaging==26.0
+pillow==10.4.0
 python-dateutil==2.9.0.post0
 pytz==2026.1.post1
 six==1.17.0

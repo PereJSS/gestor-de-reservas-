@@ -14,17 +14,17 @@ Aplicación web desarrollada con **Django 4.2** que permite gestionar hoteles, h
 
 ## Requisitos del proyecto cubiertos
 
-| Requisito | Estado |
-|---|---|
-| Evitar solapamiento de reservas | ✅ |
-| Reservas recurrentes | ✅ |
-| Calendario de disponibilidad por fechas | ✅ |
-| Panel de gestión para admins *(extra opcional)* | ✅ |
+| Requisito                                       | Estado |
+| ----------------------------------------------- | ------ |
+| Evitar solapamiento de reservas                 | ✅     |
+| Reservas recurrentes                            | ✅     |
+| Calendario de disponibilidad por fechas         | ✅     |
+| Panel de gestión para admins _(extra opcional)_ | ✅     |
 
 ## Tecnologías
 
 - Python 3.8 / Django 4.2.29
-- SQLite (desarrollo) 
+- SQLite (desarrollo)
 - Bootstrap 5
 - django-jazzmin · django-recurrence · django-scheduler · django-notifications-hq
 
@@ -54,13 +54,11 @@ El comando `cargar_demo` crea automáticamente:
 - Usuario **demo** con una reserva activa
 - Superusuario para el panel de admin
 
-| | |
-|---|---|
-| **Admin** | `/admin/` |
-| **Usuario** | `admin` |
+|                |              |
+| -------------- | ------------ |
+| **Admin**      | `/admin/`    |
+| **Usuario**    | `admin`      |
 | **Contraseña** | `Admin1234!` |
-
-
 
 ## Estructura del proyecto
 

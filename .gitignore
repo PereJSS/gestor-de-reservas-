@@ -37,3 +37,7 @@ Thumbs.db
 # Imágenes subidas (gestión local)
 hotel_images/
 room_images/
+
+.prettierignore
+
+context.txt
