@@ -2,6 +2,7 @@ from datetime import date
 
 from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
+from django.urls import reverse
 from django.test import TestCase
 
 from bookings.available_logic import room_booking_is_occupied, room_list_available_by_hotel
@@ -163,3 +164,69 @@ class DisponibilidadTest(TestCase):
             start_date=date(2026, 6, 1), end_date=date(2026, 6, 5),
         )
         self.assertNotIn(self.room, rooms)
+
+
+class RoomAvailabilityViewTest(TestCase):
+    def setUp(self):
+        self.user = make_user('user_calendar')
+        self.hotel = make_hotel('Hotel Calendar')
+        self.room = make_room(self.hotel, number='201')
+
+    def test_devuelve_dias_no_disponibles_del_mes(self):
+        RoomBooking.objects.create(
+            user=self.user,
+            room=self.room,
+            start_date=date(2026, 5, 10),
+            end_date=date(2026, 5, 13),
+        )
+
+        response = self.client.get(
+            reverse('bookings:room-availability'),
+            {'room': self.room.id, 'month': '2026-05'},
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(
+            response.json()['unavailable_dates'],
+            ['2026-05-10', '2026-05-11', '2026-05-12'],
+        )
+
+    def test_falla_si_faltan_parametros(self):
+        response = self.client.get(reverse('bookings:room-availability'))
+
+        self.assertEqual(response.status_code, 400)
+
+    def test_formulario_muestra_calendario_inline(self):
+        response = self.client.get(reverse('bookings:booking-create'))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'Calendario de disponibilidad')
+        self.assertContains(response, 'data-availability-url')
+
+    def test_disponibilidad_es_publica(self):
+        RoomBooking.objects.create(
+            user=self.user,
+            room=self.room,
+            start_date=date(2026, 5, 10),
+            end_date=date(2026, 5, 13),
+        )
+
+        response = self.client.get(
+            reverse('bookings:room-availability'),
+            {'room': self.room.id, 'month': '2026-05'},
+        )
+
+        self.assertEqual(response.status_code, 200)
+
+    def test_post_sin_login_redirige_a_login(self):
+        response = self.client.post(
+            reverse('bookings:booking-create'),
+            {
+                'room': self.room.id,
+                'start_date': '2026-05-10',
+                'end_date': '2026-05-12',
+            },
+        )
+
+        self.assertEqual(response.status_code, 302)
+        self.assertIn(reverse('core:user_login'), response.url)

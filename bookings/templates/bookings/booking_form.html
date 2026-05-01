@@ -1,4 +1,5 @@
 {% extends "_includes/_layout.html" %} {% block content %}
+{% url 'bookings:room-availability' as room_availability_url %}
 <div class="row justify-content-center">
   <div class="col-12 col-md-8 col-lg-6">
     <div class="card shadow-sm border-0">
@@ -7,6 +8,149 @@
         <p class="text-muted mb-4">
           Completa los datos para confirmar tu reserva.
         </p>
+
+        <style>
+          .booking-calendar {
+            border: 1px solid #d9e4dd;
+            border-radius: 1rem;
+            background: linear-gradient(180deg, #f8fffb 0%, #ffffff 100%);
+            padding: 1rem;
+          }
+
+          .booking-calendar__header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 0.75rem;
+            margin-bottom: 1rem;
+          }
+
+          .booking-calendar__title {
+            margin: 0;
+            font-size: 1rem;
+            font-weight: 700;
+            color: #183a2d;
+            text-transform: capitalize;
+          }
+
+          .booking-calendar__nav {
+            border: 0;
+            border-radius: 999px;
+            width: 2.5rem;
+            height: 2.5rem;
+            background: #e2f1e8;
+            color: #1d5b41;
+            font-size: 1.1rem;
+            font-weight: 700;
+          }
+
+          .booking-calendar__weekdays,
+          .booking-calendar__grid {
+            display: grid;
+            grid-template-columns: repeat(7, minmax(0, 1fr));
+            gap: 0.45rem;
+          }
+
+          .booking-calendar__weekday {
+            text-align: center;
+            font-size: 0.78rem;
+            font-weight: 700;
+            color: #557a67;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+          }
+
+          .booking-calendar__day,
+          .booking-calendar__empty {
+            aspect-ratio: 1 / 1;
+          }
+
+          .booking-calendar__day {
+            border: 0;
+            border-radius: 0.9rem;
+            font-weight: 600;
+            transition: transform 0.15s ease, box-shadow 0.15s ease;
+            box-shadow: inset 0 0 0 1px rgba(24, 58, 45, 0.08);
+          }
+
+          .booking-calendar__day:hover {
+            transform: translateY(-1px);
+          }
+
+          .booking-calendar__day--available {
+            background: #dff7e9;
+            color: #17553c;
+          }
+
+          .booking-calendar__day--unavailable {
+            background: #fde3e0;
+            color: #a03131;
+          }
+
+          .booking-calendar__day--selected,
+          .booking-calendar__day--range {
+            background: #1f6b4f;
+            color: #ffffff;
+            box-shadow: none;
+          }
+
+          .booking-calendar__day--today {
+            box-shadow: inset 0 0 0 2px #f0b429;
+          }
+
+          .booking-calendar__day--disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+          }
+
+          .booking-calendar__legend {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.75rem 1rem;
+            margin-top: 1rem;
+          }
+
+          .booking-calendar__legend-item {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.45rem;
+            color: #4f5f56;
+            font-size: 0.9rem;
+          }
+
+          .booking-calendar__swatch {
+            width: 0.95rem;
+            height: 0.95rem;
+            border-radius: 999px;
+          }
+
+          .booking-calendar__swatch--available {
+            background: #5dc48a;
+          }
+
+          .booking-calendar__swatch--unavailable {
+            background: #e16868;
+          }
+
+          .booking-calendar__swatch--selected {
+            background: #1f6b4f;
+          }
+
+          .booking-calendar__status {
+            min-height: 1.5rem;
+          }
+
+          @media (max-width: 575.98px) {
+            .booking-calendar {
+              padding: 0.85rem;
+            }
+
+            .booking-calendar__weekdays,
+            .booking-calendar__grid {
+              gap: 0.3rem;
+            }
+          }
+        </style>
 
         <form method="post" novalidate>
           {% csrf_token %} {% if form.non_field_errors %}
@@ -22,18 +166,57 @@
             {% endfor %}
           </div>
 
-          <div class="mb-3">
-            <label for="id_start_date" class="form-label"
-              >Fecha de entrada</label
-            >
-            {{ form.start_date }} {% for error in form.start_date.errors %}
+          <div class="mb-4">
+            <div class="d-none">{{ form.start_date }}{{ form.end_date }}</div>
+            <label class="form-label d-block">Calendario de disponibilidad</label>
+            <div class="booking-calendar" data-availability-url="{{ room_availability_url }}">
+              <div class="booking-calendar__header">
+                <button type="button" class="booking-calendar__nav" data-calendar-nav="prev" aria-label="Mes anterior">
+                  &lsaquo;
+                </button>
+                <p class="booking-calendar__title" data-calendar-title></p>
+                <button type="button" class="booking-calendar__nav" data-calendar-nav="next" aria-label="Mes siguiente">
+                  &rsaquo;
+                </button>
+              </div>
+
+              <div class="booking-calendar__weekdays">
+                <div class="booking-calendar__weekday">Lun</div>
+                <div class="booking-calendar__weekday">Mar</div>
+                <div class="booking-calendar__weekday">Mie</div>
+                <div class="booking-calendar__weekday">Jue</div>
+                <div class="booking-calendar__weekday">Vie</div>
+                <div class="booking-calendar__weekday">Sab</div>
+                <div class="booking-calendar__weekday">Dom</div>
+              </div>
+
+              <div class="booking-calendar__grid mt-2" data-calendar-grid></div>
+              <p class="booking-calendar__status text-muted small mt-3 mb-0" data-calendar-status>
+                Selecciona una habitación para cargar su disponibilidad.
+              </p>
+
+              <div class="booking-calendar__legend">
+                <span class="booking-calendar__legend-item">
+                  <span class="booking-calendar__swatch booking-calendar__swatch--available"></span>
+                  Disponible
+                </span>
+                <span class="booking-calendar__legend-item">
+                  <span class="booking-calendar__swatch booking-calendar__swatch--unavailable"></span>
+                  No disponible
+                </span>
+                <span class="booking-calendar__legend-item">
+                  <span class="booking-calendar__swatch booking-calendar__swatch--selected"></span>
+                  Tu seleccion
+                </span>
+              </div>
+            </div>
+            <div class="form-text mt-2" id="booking-selection-summary">
+              Elige fecha de entrada y salida desde el calendario.
+            </div>
+            {% for error in form.start_date.errors %}
             <div class="text-danger small">{{ error }}</div>
             {% endfor %}
-          </div>
-
-          <div class="mb-3">
-            <label for="id_end_date" class="form-label">Fecha de salida</label>
-            {{ form.end_date }} {% for error in form.end_date.errors %}
+            {% for error in form.end_date.errors %}
             <div class="text-danger small">{{ error }}</div>
             {% endfor %}
           </div>
@@ -59,4 +242,260 @@
     </div>
   </div>
 </div>
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    const roomInput = document.getElementById('id_room');
+    const startInput = document.getElementById('id_start_date');
+    const endInput = document.getElementById('id_end_date');
+    const calendarRoot = document.querySelector('.booking-calendar');
+    const grid = calendarRoot?.querySelector('[data-calendar-grid]');
+    const title = calendarRoot?.querySelector('[data-calendar-title]');
+    const status = calendarRoot?.querySelector('[data-calendar-status]');
+    const summary = document.getElementById('booking-selection-summary');
+    const availabilityUrl = calendarRoot?.dataset.availabilityUrl;
+    const monthFormatter = new Intl.DateTimeFormat('es-ES', {
+      month: 'long',
+      year: 'numeric'
+    });
+    const displayFormatter = new Intl.DateTimeFormat('es-ES', {
+      day: '2-digit',
+      month: 'long',
+      year: 'numeric'
+    });
+    const today = new Date();
+    let currentMonth = new Date(today.getFullYear(), today.getMonth(), 1);
+    let unavailableDates = new Set();
+
+    if (!calendarRoot || !grid || !title || !status || !summary || !roomInput || !startInput || !endInput) {
+      return;
+    }
+
+    function toIsoString(dateObject) {
+      const year = dateObject.getFullYear();
+      const month = String(dateObject.getMonth() + 1).padStart(2, '0');
+      const day = String(dateObject.getDate()).padStart(2, '0');
+      return `${year}-${month}-${day}`;
+    }
+
+    function isoToDate(value) {
+      if (!value) {
+        return null;
+      }
+
+      const parts = value.split('-').map(Number);
+      if (parts.length !== 3 || parts.some(Number.isNaN)) {
+        return null;
+      }
+
+      return new Date(parts[0], parts[1] - 1, parts[2]);
+    }
+
+    function monthKey(dateObject) {
+      return `${dateObject.getFullYear()}-${String(dateObject.getMonth() + 1).padStart(2, '0')}`;
+    }
+
+    function updateSummary() {
+      if (startInput.value && endInput.value) {
+        summary.textContent = `Estancia seleccionada: ${displayFormatter.format(isoToDate(startInput.value))} a ${displayFormatter.format(isoToDate(endInput.value))}.`;
+        return;
+      }
+
+      if (startInput.value) {
+        summary.textContent = `Entrada seleccionada: ${displayFormatter.format(isoToDate(startInput.value))}. Elige ahora tu salida.`;
+        return;
+      }
+
+      summary.textContent = 'Elige fecha de entrada y salida desde el calendario.';
+    }
+
+    function rangeContainsUnavailable(startValue, endValue) {
+      let current = isoToDate(startValue);
+      const endDate = isoToDate(endValue);
+
+      while (current && endDate && current < endDate) {
+        if (unavailableDates.has(toIsoString(current))) {
+          return true;
+        }
+        current.setDate(current.getDate() + 1);
+      }
+
+      return false;
+    }
+
+    function setStatus(message, tone) {
+      status.className = 'booking-calendar__status small mt-3 mb-0';
+      if (tone === 'danger') {
+        status.classList.add('text-danger');
+      } else if (tone === 'success') {
+        status.classList.add('text-success');
+      } else {
+        status.classList.add('text-muted');
+      }
+      status.textContent = message;
+    }
+
+    function renderCalendar() {
+      const year = currentMonth.getFullYear();
+      const month = currentMonth.getMonth();
+      const firstDay = new Date(year, month, 1);
+      const lastDay = new Date(year, month + 1, 0);
+      const leadingEmpty = (firstDay.getDay() + 6) % 7;
+      const selectedStart = startInput.value;
+      const selectedEnd = endInput.value;
+
+      title.textContent = monthFormatter.format(firstDay);
+      grid.innerHTML = '';
+
+      for (let index = 0; index < leadingEmpty; index += 1) {
+        const emptyCell = document.createElement('div');
+        emptyCell.className = 'booking-calendar__empty';
+        grid.appendChild(emptyCell);
+      }
+
+      for (let day = 1; day <= lastDay.getDate(); day += 1) {
+        const current = new Date(year, month, day);
+        const currentIso = toIsoString(current);
+        const button = document.createElement('button');
+        const isUnavailable = unavailableDates.has(currentIso);
+        const isToday = currentIso === toIsoString(today);
+        const isSelected = currentIso === selectedStart || currentIso === selectedEnd;
+        const isRangeDay = selectedStart && selectedEnd && currentIso > selectedStart && currentIso < selectedEnd;
+
+        button.type = 'button';
+        button.className = 'booking-calendar__day';
+        button.textContent = String(day);
+        button.dataset.date = currentIso;
+        button.classList.add(isUnavailable ? 'booking-calendar__day--unavailable' : 'booking-calendar__day--available');
+
+        if (isToday) {
+          button.classList.add('booking-calendar__day--today');
+        }
+
+        if (isSelected) {
+          button.classList.add('booking-calendar__day--selected');
+        } else if (isRangeDay) {
+          button.classList.add('booking-calendar__day--range');
+        }
+
+        grid.appendChild(button);
+      }
+
+      updateSummary();
+    }
+
+    function handleDateSelection(dateValue) {
+      if (!roomInput.value) {
+        setStatus('Selecciona primero una habitación.', 'danger');
+        return;
+      }
+
+      if (unavailableDates.has(dateValue) && !startInput.value) {
+        setStatus('Ese dia no esta disponible para iniciar la estancia.', 'danger');
+        return;
+      }
+
+      if (!startInput.value || (startInput.value && endInput.value)) {
+        if (unavailableDates.has(dateValue)) {
+          setStatus('Ese dia no esta disponible para iniciar la estancia.', 'danger');
+          return;
+        }
+
+        startInput.value = dateValue;
+        endInput.value = '';
+        setStatus('Entrada seleccionada. Ahora elige la fecha de salida.', 'success');
+        renderCalendar();
+        return;
+      }
+
+      if (dateValue <= startInput.value) {
+        if (unavailableDates.has(dateValue)) {
+          setStatus('La nueva fecha de entrada debe estar disponible.', 'danger');
+          return;
+        }
+
+        startInput.value = dateValue;
+        endInput.value = '';
+        setStatus('Entrada actualizada. Ahora elige la fecha de salida.', 'success');
+        renderCalendar();
+        return;
+      }
+
+      if (rangeContainsUnavailable(startInput.value, dateValue)) {
+        setStatus('La estancia incluye dias no disponibles. Elige otra salida.', 'danger');
+        return;
+      }
+
+      endInput.value = dateValue;
+      setStatus('Rango de reserva listo para confirmar.', 'success');
+      renderCalendar();
+    }
+
+    async function loadAvailability() {
+      if (!roomInput.value) {
+        unavailableDates = new Set();
+        setStatus('Selecciona una habitación para cargar su disponibilidad.', 'muted');
+        renderCalendar();
+        return;
+      }
+
+      setStatus('Cargando disponibilidad...', 'muted');
+
+      try {
+        const response = await fetch(`${availabilityUrl}?room=${roomInput.value}&month=${monthKey(currentMonth)}`, {
+          headers: {
+            'X-Requested-With': 'XMLHttpRequest'
+          }
+        });
+        const payload = await response.json();
+
+        if (!response.ok) {
+          throw new Error(payload.error || 'No se pudo cargar la disponibilidad.');
+        }
+
+        unavailableDates = new Set(payload.unavailable_dates || []);
+
+        if (startInput.value && !monthKey(isoToDate(startInput.value)).startsWith(payload.month)) {
+          endInput.value = '';
+        }
+
+        setStatus('Verde: disponible. Rojo: ocupado. Verde oscuro: tu seleccion.', 'muted');
+        renderCalendar();
+      } catch (error) {
+        unavailableDates = new Set();
+        setStatus(error.message, 'danger');
+        renderCalendar();
+      }
+    }
+
+    calendarRoot.addEventListener('click', function (event) {
+      const navButton = event.target.closest('[data-calendar-nav]');
+      if (navButton) {
+        const direction = navButton.dataset.calendarNav === 'next' ? 1 : -1;
+        currentMonth = new Date(currentMonth.getFullYear(), currentMonth.getMonth() + direction, 1);
+        loadAvailability();
+        return;
+      }
+
+      const dayButton = event.target.closest('[data-date]');
+      if (dayButton) {
+        handleDateSelection(dayButton.dataset.date);
+      }
+    });
+
+    roomInput.addEventListener('change', function () {
+      startInput.value = '';
+      endInput.value = '';
+      loadAvailability();
+    });
+
+    if (startInput.value) {
+      const initialStart = isoToDate(startInput.value);
+      if (initialStart) {
+        currentMonth = new Date(initialStart.getFullYear(), initialStart.getMonth(), 1);
+      }
+    }
+
+    loadAvailability();
+  });
+</script>
 {% endblock %}

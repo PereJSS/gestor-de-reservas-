@@ -1,6 +1,7 @@
 from django import forms
 from bookings.models import Room, RoomBooking
 
+
 class RoomBookingForm(forms.ModelForm):
     class Meta:
         model = RoomBooking
@@ -9,4 +10,5 @@ class RoomBookingForm(forms.ModelForm):
             'start_date': forms.DateInput(attrs={'type': 'date', 'class': 'form-control'}),
             'end_date': forms.DateInput(attrs={'type': 'date', 'class': 'form-control'}),
             'room': forms.Select(attrs={'class': 'form-select'}),
+            'recurrence': forms.Textarea(attrs={'class': 'form-control', 'rows': 3}),
         }
